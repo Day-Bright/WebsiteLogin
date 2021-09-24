@@ -8,7 +8,7 @@ sys.path.append("..")
 import web_heardes.steam_heardes as heardes
 
 
-def getRESpubKey(username):
+def getRSAPublicKey(username):
     res_url = "https://store.steampowered.com/login/getrsakey/"
     username = username
     millis = int(round(time.time() * 1000))
@@ -24,7 +24,7 @@ def getRESpubKey(username):
 
 
 def getEncryptKey(username, password):
-    getData = getRESpubKey(username)
+    getData = getRSAPublicKey(username)
     password = password
     file = "web_js/steam_login.js"
     ctx = execjs.compile(open(file, encoding="utf-8").read())
