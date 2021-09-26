@@ -56,7 +56,7 @@ def login(secretCode, userName, inf):
         "txtKeyModulus": txtKeyModulus
     }
     login_response = session.post(url=login_url, headers=heardes.hljit_heardes, data=data)
-    main_url = "http://jw.hljit.edu.cn/xs_main.aspx?xh=20181092"
+    main_url = "http://jw.hljit.edu.cn/xs_main.aspx?xh={userName}".format(userName=userName)
     main_response = session.get(url=main_url, headers=heardes.main_heardes)
     with open("20181092.html", "w", encoding="utf-8") as f:
         f.write(main_response.text)
