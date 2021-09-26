@@ -66,7 +66,7 @@ def login(secretCode, userName, inf):
 def checkcodeRecognition():
     host = 'https://codevirify.market.alicloudapi.com'
     path = '/icredit_ai_image/verify_code/v1'
-    appcode = '1991317cc15c4fdeaea568e29beace60'
+    appcode = 'xxxxxxx'
     url = host + path
     bodys = {}
     querys = ""
