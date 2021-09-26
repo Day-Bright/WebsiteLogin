@@ -2,6 +2,9 @@ import execjs
 import requests
 import web_heardes.hljit_heardes as heardes
 from bs4 import BeautifulSoup
+import urllib
+import urllib.request
+import base64
 
 
 # 获取登录信息
@@ -9,9 +12,6 @@ def getInf(password):
     session = requests.Session()
     hljit_url = "http://jw.hljit.edu.cn/"
     login_main = session.get(url=hljit_url, headers=heardes.hljit_heardes)
-    cookie = session.cookies
-    cookie = cookie.get_dict()
-    # print(cookie)
     soup = BeautifulSoup(login_main.content, 'lxml', from_encoding='utf-8')
     viewstate = soup.find('input', id='__VIEWSTATE')["value"]
     viewstategenrator = soup.find('input', id='__VIEWSTATEGENERATOR')["value"]
@@ -25,17 +25,16 @@ def getInf(password):
                                                                             txtKeyModulus=txtKeyModulus)
     encrypt_key = ctx.eval(js)
     checkcode_url = "http://jw.hljit.edu.cn" + checkcode_src
-    checkcode_response = requests.get(url=checkcode_url, cookies=cookie, headers=heardes.checkcode_heardes).content
+    checkcode_response = session.get(url=checkcode_url, headers=heardes.checkcode_heardes).content
     with open(r"checkcode_img/checkcode.jpeg", "wb") as jpegFile:
         jpegFile.write(checkcode_response)
 
-    # print("\n"+viewstate+"\n"+viewstategenrator+"\n"+txtKeyExponent+"\n"+txtKeyModulus+"\n"+encrypt_key)
-    return cookie, viewstate, viewstategenrator, txtKeyExponent, txtKeyModulus, encrypt_key
+    return session, viewstate, viewstategenrator, txtKeyExponent, txtKeyModulus, encrypt_key
 
 
 # 登陆
 def login(secretCode, userName, inf):
-    cookie = inf[0]
+    session = inf[0]
     viewstate = inf[1]
     viewstategenrator = inf[2]
     txtKeyExponent = inf[3]
@@ -56,19 +55,39 @@ def login(secretCode, userName, inf):
         "txtKeyExponent": txtKeyExponent,
         "txtKeyModulus": txtKeyModulus
     }
-    login_response = requests.post(url=login_url, headers=heardes.hljit_heardes, data=data, cookies=cookie)
+    login_response = session.post(url=login_url, headers=heardes.hljit_heardes, data=data)
     main_url = "http://jw.hljit.edu.cn/xs_main.aspx?xh=20181092"
-    main_response = requests.get(url=main_url, headers=heardes.main_heardes, cookies=cookie)
+    main_response = session.get(url=main_url, headers=heardes.main_heardes)
     with open("20181092.html", "w", encoding="utf-8") as f:
         f.write(main_response.text)
 
 
 # 识别验证码
 def checkcodeRecognition():
-    pass
+    host = 'https://codevirify.market.alicloudapi.com'
+    path = '/icredit_ai_image/verify_code/v1'
+    appcode = '1991317cc15c4fdeaea568e29beace60'
+    url = host + path
+    bodys = {}
+    querys = ""
+    f = open(r'C:\Users\Me\Desktop\website_login\checkcode_img\checkcode.jpeg', 'rb')
+    contents = base64.b64encode(f.read())
+    f.close()
+    bodys['IMAGE'] = contents
+    bodys['IMAGE_TYPE'] = '0'
+    post_data = urllib.parse.urlencode(bodys).encode('utf-8')
+    request = urllib.request.Request(url, post_data)
+    request.add_header('Authorization', 'APPCODE ' + appcode)
+    request.add_header('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
+    response = urllib.request.urlopen(request)
+    content = response.read()
+    if (content):
+        checkcode = content.decode('utf-8')[-7:-3]
+        print(checkcode)
+        return checkcode
 
 
 if __name__ == '__main__':
     inf = getInf("xxx")  # 输入密码
-    checkcodeRecognition()  # 验证码识别未完成,完成可直接传入session,直接登录
-    login("xxxx", "xxx", inf)  # 输入验证码，学号（验证码未自动识别）
+    secretCode = checkcodeRecognition()  # 调用api
+    login(secretCode, "xxx", inf)  # 输入验证码，学号
