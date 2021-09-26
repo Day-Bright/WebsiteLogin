@@ -90,4 +90,4 @@ def checkcodeRecognition():
 if __name__ == '__main__':
     inf = getInf("xxx")  # 输入密码
     secretCode = checkcodeRecognition()  # 调用api
-    login(secretCode, "xxx", inf)  # 输入验证码，学号
+    login(secretCode, "20181092", inf)  # 输入验证码，学号
