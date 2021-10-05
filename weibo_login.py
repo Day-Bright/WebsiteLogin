@@ -86,7 +86,7 @@ def login(login_inf, encrypt_key):
 
 
 if __name__ == '__main__':
-    login_inf = getPubKey("xxxxxx")
-    encrypt_key = getEncryptKey("xxxxx", login_inf)
+    login_inf = getPubKey("xxxxxx")  # 输入用户名
+    encrypt_key = getEncryptKey("xxxxx", login_inf)  # 输入密码
     response = login(login_inf, encrypt_key)
     print(response.text)
