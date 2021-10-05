@@ -19,8 +19,7 @@ import web_heardes.weibo_heardes as heardes
 def getPubKey(usrename):
     getPubKey_url = "https://login.sina.com.cn/sso/prelogin.php"
     millis_start = int(round(time.time() * 1000))
-    su = usrename.encode("utf-8")
-    su = base64.b64encode(su)
+    su = base64.b64encode(usrename.encode("utf-8"))
     su = str(su)[2:-1]
     params = {
         "entry": "weibo",
@@ -52,17 +51,13 @@ def getEncryptKey(password, login_inf):
 
 def login(login_inf, encrypt_key):
     """
-    无法验证是否登录成功，需要手机验证码
+    返回结果中携带token 即登录成功
     :param login_inf:
     :param encrypt_key:
     :return:
     """
     pubkey_dict = login_inf[1]
     prelt = int(time.time() * 1000) - login_inf[2] - pubkey_dict['exectime']
-    # print(prelt)
-    # print(int(time.time() * 1000))
-    # print(login_inf[2])
-    # print(pubkey_dict['exectime'])
     login_url = "https://login.sina.com.cn/sso/login.php?client=ssologin.js(v1.4.19)"
     data = {
         "entry": "weibo",
@@ -87,16 +82,11 @@ def login(login_inf, encrypt_key):
         "returntype": "META",
     }
     response = requests.post(url=login_url, data=data, headers=heardes.login_heardes)
-    print(response.cookies)
-    print(response.status_code)
     return response
 
 
 if __name__ == '__main__':
-    login_inf = getPubKey("15776690679")
-    encrypt_key = getEncryptKey("911922", login_inf)
-    print(login_inf)
-    print(encrypt_key)
-    login(login_inf,encrypt_key)
-
-
+    login_inf = getPubKey("xxxxxx")
+    encrypt_key = getEncryptKey("xxxxx", login_inf)
+    response = login(login_inf, encrypt_key)
+    print(response.text)
