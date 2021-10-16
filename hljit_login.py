@@ -5,10 +5,15 @@ from bs4 import BeautifulSoup
 import urllib
 import urllib.request
 import base64
+import muggle_ocr
 
 
-# 获取登录信息
 def getInf(password):
+    """
+    获取登录相关信息
+    :param password: 
+    :return: 
+    """
     session = requests.Session()
     hljit_url = "http://jw.hljit.edu.cn/"
     login_main = session.get(url=hljit_url, headers=heardes.hljit_heardes)
@@ -32,8 +37,14 @@ def getInf(password):
     return session, viewstate, viewstategenrator, txtKeyExponent, txtKeyModulus, encrypt_key
 
 
-# 登陆
 def login(secretCode, userName, inf):
+    """
+    登录
+    :param secretCode: 
+    :param userName: 
+    :param inf: 
+    :return: 
+    """
     session = inf[0]
     viewstate = inf[1]
     viewstategenrator = inf[2]
@@ -56,21 +67,25 @@ def login(secretCode, userName, inf):
         "txtKeyModulus": txtKeyModulus
     }
     login_response = session.post(url=login_url, headers=heardes.hljit_heardes, data=data)
+    print(login_response.status_code)
     main_url = "http://jw.hljit.edu.cn/xs_main.aspx?xh={userName}".format(userName=userName)
     main_response = session.get(url=main_url, headers=heardes.main_heardes)
     with open("20181092.html", "w", encoding="utf-8") as f:
         f.write(main_response.text)
 
 
-# 识别验证码
 def checkcodeRecognition():
+    """
+    api验证码识别
+    :return: 
+    """
     host = 'https://codevirify.market.alicloudapi.com'
     path = '/icredit_ai_image/verify_code/v1'
-    appcode = 'xxxxxxx'
+    appcode = '1991317cc15c4fdeaea568e29beace60'
     url = host + path
     bodys = {}
     querys = ""
-    f = open(r'C:\Users\Me\Desktop\website_login\checkcode_img\checkcode.jpeg', 'rb')
+    f = open(r'checkcode_img/checkcode.jpeg', 'rb')
     contents = base64.b64encode(f.read())
     f.close()
     bodys['IMAGE'] = contents
@@ -87,7 +102,21 @@ def checkcodeRecognition():
         return checkcode
 
 
+def checkcode_ocr():
+    """
+    muggle_ocr本地验证码识别
+    :return: 
+    """
+    sdk = muggle_ocr.SDK(model_type=muggle_ocr.ModelType.Captcha)
+    with open(r"checkcode_img/checkcode.jpeg", "rb") as f:
+        b = f.read()
+    checkcode = sdk.predict(image_bytes=b, param_key=4)
+    print(checkcode)
+    return checkcode
+
+
 if __name__ == '__main__':
-    inf = getInf("xxx")  # 输入密码
-    secretCode = checkcodeRecognition()  # 调用api
+    inf = getInf("Hit911922")  # 输入密码
+    # secretCode = checkcodeRecognition()  # 调用api
+    secretCode = checkcode_ocr()
     login(secretCode, "20181092", inf)  # 输入验证码，学号
