@@ -81,7 +81,7 @@ def checkcodeRecognition():
     """
     host = 'https://codevirify.market.alicloudapi.com'
     path = '/icredit_ai_image/verify_code/v1'
-    appcode = '1991317cc15c4fdeaea568e29beace60'
+    appcode = 'xxxx'
     url = host + path
     bodys = {}
     querys = ""
@@ -116,7 +116,7 @@ def checkcode_ocr():
 
 
 if __name__ == '__main__':
-    inf = getInf("Hit911922")  # 输入密码
+    inf = getInf("xxxxx")  # 输入密码
     # secretCode = checkcodeRecognition()  # 调用api
     secretCode = checkcode_ocr()
-    login(secretCode, "20181092", inf)  # 输入验证码，学号
+    login(secretCode, "xxxxx", inf)  # 输入验证码，学号
